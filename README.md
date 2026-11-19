@@ -85,3 +85,19 @@ open -a /Applications/K8Tune.app
 ## 许可
 
 MIT
+
+## 与其它开机脚本共存（重要）
+
+如果机器上还有自定义的 `phxdisplay` 类守护进程（例如 nullarc 的显示/残影修复脚本），**不要让它在开机时写 `debug.phx_pm_*`**。
+两个守护进程会在开机时互相覆盖频率上限，表现为"设置 1600 却被改回 800"。
+
+正确分工：
+
+```sh
+# display / ghosting daemon: 只设置显示相关
+sysctl -w debug.nvaccel_surface_gpu_on=0
+
+# k8tuned: 独占 debug.phx_pm_mode / debug.phx_pm_gfx_max
+```
+
+本机已按此调整：`/usr/local/bin/phxdisplay.sh` 只保留 `surface_gpu_on=0`，频率由 `local.k8tune` 管理。
