@@ -203,6 +203,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let name = sender.identifier?.rawValue ?? "balanced"
         state.profile = name
         state.capMHz = sender.tag
+        if name == "auto" {
+            state.autoGovernor = true
+            autoCheckbox.state = .on
+        }
         writeState(state)
         slider.doubleValue = Double(state.capMHz)
         sliderValue.stringValue = "\(state.capMHz) MHz"

@@ -42,7 +42,7 @@ while true; do
         balanced)    base=1200 ;;
         performance) base=1600 ;;
         max)         base=2600 ;;
-        auto)        base=2600; auto=true ;;
+        auto)        base=2600 ;;
         custom)      base=$cap ;;
         *)           base=1200 ;;
     esac
