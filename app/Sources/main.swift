@@ -121,7 +121,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         v.addSubview(label("K8 GPU 性能与散热控制", NSRect(x: 20, y: 440, width: 520, height: 24), size: 17, bold: true))
 
         // status box
-        let box = NSBox(frame: NSRect(x: 20, y: 250, width: 520, height: 170))
+        let box = NSBox(frame: NSRect(x: 20, y: 270, width: 520, height: 165))
         box.title = "实时状态"
         v.addSubview(box)
         let rows: [(String, String)] = [
@@ -131,25 +131,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             ("ws",     "WindowServer CPU"),
             ("load",   "系统负载 (1 min)")
         ]
-        var y: CGFloat = 210
+        var y: CGFloat = 392
         for (key, title) in rows {
             let name = label(title, NSRect(x: 40, y: y, width: 220, height: 20))
             let val = label("—", NSRect(x: 300, y: y, width: 220, height: 20), bold: true)
             val.alignment = .right
             v.addSubview(name); v.addSubview(val)
             statusLabels[key] = val
-            y -= 30
+            y -= 28
         }
 
         // presets
-        v.addSubview(label("档位", NSRect(x: 20, y: 212, width: 200, height: 20), size: 14, bold: true))
+        v.addSubview(label("档位", NSRect(x: 20, y: 238, width: 200, height: 20), size: 14, bold: true))
         var x: CGFloat = 20
         for (i, p) in presets.enumerated() {
             let b = NSButton(title: p.0, target: self, action: #selector(presetClicked(_:)))
             b.tag = p.2
             b.identifier = NSUserInterfaceItemIdentifier(p.1)
             b.bezelStyle = .rounded
-            b.frame = NSRect(x: x, y: 176, width: 80, height: 30)
+            b.frame = NSRect(x: x, y: 202, width: 80, height: 30)
             if i == 5 { b.toolTip = "每 2 秒按负载自动调整：高负载降档，低负载恢复" }
             v.addSubview(b)
             presetButtons.append(b)
@@ -159,37 +159,37 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // custom slider
         slider = NSSlider(value: Double(state.capMHz), minValue: 800, maxValue: 2600,
                           target: self, action: #selector(sliderChanged(_:)))
-        slider.frame = NSRect(x: 20, y: 136, width: 380, height: 24)
+        slider.frame = NSRect(x: 20, y: 162, width: 380, height: 24)
         slider.numberOfTickMarks = 7
         slider.allowsTickMarkValuesOnly = false
         v.addSubview(slider)
 
-        sliderValue = label("\(state.capMHz) MHz", NSRect(x: 406, y: 138, width: 72, height: 20), bold: true)
+        sliderValue = label("\(state.capMHz) MHz", NSRect(x: 406, y: 164, width: 72, height: 20), bold: true)
         sliderValue.alignment = .center
         v.addSubview(sliderValue)
 
         let apply = NSButton(title: "应用", target: self, action: #selector(applyCustom))
         apply.bezelStyle = .rounded
-        apply.frame = NSRect(x: 480, y: 134, width: 60, height: 28)
+        apply.frame = NSRect(x: 480, y: 160, width: 60, height: 28)
         v.addSubview(apply)
 
         // auto governor
         autoCheckbox = NSButton(checkboxWithTitle: "负载联动（高负载自动降档，低负载恢复到档位上限）",
                                 target: self, action: #selector(autoToggled))
-        autoCheckbox.frame = NSRect(x: 20, y: 100, width: 520, height: 24)
+        autoCheckbox.frame = NSRect(x: 20, y: 122, width: 520, height: 24)
         autoCheckbox.state = state.autoGovernor ? .on : .off
         v.addSubview(autoCheckbox)
 
         // fan note
         let note = label("风扇说明：K8 的风扇由 BIOS/EC 按固件温度控制，macOS 无法直接设转速。" +
                          "本应用通过 GPU 频率上限与负载联动降低发热，从而让固件自动降速。",
-                         NSRect(x: 20, y: 44, width: 520, height: 44))
+                         NSRect(x: 20, y: 64, width: 520, height: 44))
         note.lineBreakMode = .byWordWrapping
         note.maximumNumberOfLines = 2
         note.textColor = .secondaryLabelColor
         v.addSubview(note)
 
-        hint = label("档位会在 1 秒内由后台守护进程应用", NSRect(x: 20, y: 16, width: 520, height: 20))
+        hint = label("档位会在 1 秒内由后台守护进程应用", NSRect(x: 20, y: 24, width: 520, height: 20))
         hint.textColor = .secondaryLabelColor
         v.addSubview(hint)
 
