@@ -101,3 +101,10 @@ sysctl -w debug.nvaccel_surface_gpu_on=0
 ```
 
 本机已按此调整：`/usr/local/bin/phxdisplay.sh` 只保留 `surface_gpu_on=0`，频率由 `local.k8tune` 管理。
+
+## 与 mesboot 修复的关系（重要）
+
+如果机器的 `mesboot` 已包含 `CP_MEC_DOORBELL_RANGE` 修复（nullarc #14，`gfx-idle` 分支 `994fa0f`），
+空闲时 GFXCLK 会自然回落到 800 MHz，本工具的档位上限只限制**峰值**，不再需要用它来压空闲功耗。
+
+验证：`sysctl debug.phx_pm_gfxclk` 在空闲时应读 800，而不是 2600。
