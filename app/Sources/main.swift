@@ -90,6 +90,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         state = readState()
+        if state.profile == "auto" && !state.autoGovernor {
+            state.autoGovernor = true
+            writeState(state)
+        }
         buildWindow()
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
             self?.refresh()
