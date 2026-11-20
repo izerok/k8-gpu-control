@@ -100,7 +100,7 @@ sysctl -w debug.nvaccel_surface_gpu_on=0
 # k8tuned: 独占 debug.phx_pm_mode / debug.phx_pm_gfx_max
 ```
 
-本机已按此调整：`/usr/local/bin/phxdisplay.sh` 只保留 `surface_gpu_on=0`，频率由 `local.k8tune` 管理。
+本机已按此调整：`/usr/local/bin/phxdisplay.sh` 只设置显示相关（`surface_gpu_on=0` + `phxfb_dbuf=1`），频率由 `local.k8tune` 管理。
 
 ## 与 mesboot 修复的关系（重要）
 
