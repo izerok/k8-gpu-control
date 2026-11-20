@@ -101,6 +101,10 @@ while true; do
     # never apply. Log only when the target changes.
     sysctl -w debug.phx_pm_mode=1 >/dev/null 2>&1
     sysctl -w debug.phx_pm_gfx_max="$target" >/dev/null 2>&1
+    # GFXOFF: let the PMFW power down the GPU when idle (fork PhxBringup build 37
+    # only; harmless no-op on builds without it). Idle socket power 47 W -> 27 W
+    # in the 2026-11-20 A/B on K8.
+    sysctl -w debug.phx_pm_gfxoff=1 >/dev/null 2>&1
 
     if [ "$target" != "$last_target" ]; then
         echo "$(date '+%F %T') profile=$profile auto=$auto cap=$target ws=$ws la=$la" >> "$LOG"

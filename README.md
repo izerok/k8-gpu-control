@@ -75,6 +75,16 @@ open -a /Applications/K8Tune.app
 - 档位切换（max→performance→silent）在 2 秒内由守护进程应用
 - 自动联动：高负载持续 30 秒后按 200 MHz 步进下降，静置 60 秒后回升
 
+## GFXOFF / 空闲断电（2026-11-20）
+
+守护进程每个 tick 还会写 `debug.phx_pm_gfxoff=1`（fork PhxBringup build 37 的 PM 才有）：
+
+- 空闲时 PMFW 给整块 GPU 断电，有提交/寄存器访问时自动唤醒（`debug.phx_pm_gfxoff_state` 0/1/2）
+- K8 A/B：空闲 socket **47 W → 27 W**；再叠加 `gpucg.sh all`（MGCG/CGCG/CGLS 时钟门控）→ **23.4 W**，
+  `gfx_temp` 54.5 → 50.1 °C，GPU 空闲仍 800 MHz，Metal/WindowServer 正常
+- 回退：`sudo sysctl -w debug.phx_pm_gfxoff=0`；时钟门控回退：`sudo /Users/Shared/gpu/gpucg.sh off`
+- upstream main `3497d87` 的 PhxBringup **没有 PM 代码**，这些 OID 不存在；K8 使用的是 fork `hdmi-fb2` build 37
+
 ## 注意事项
 
 - **不要用动态/航拍（Aerial）壁纸**：`NeptuneOneWallpaper` + `VTDecoderXPCService` 会持续解码视频，切换壁纸时接近卡死；请使用静态图片壁纸
@@ -96,8 +106,9 @@ MIT
 ```sh
 # display / ghosting daemon: 只设置显示相关
 sysctl -w debug.nvaccel_surface_gpu_on=0
+sysctl -w debug.phxfb_dbuf=1
 
-# k8tuned: 独占 debug.phx_pm_mode / debug.phx_pm_gfx_max
+# k8tuned: 独占 debug.phx_pm_mode / debug.phx_pm_gfx_max / debug.phx_pm_gfxoff
 ```
 
 本机已按此调整：`/usr/local/bin/phxdisplay.sh` 只设置显示相关（`surface_gpu_on=0` + `phxfb_dbuf=1`），频率由 `local.k8tune` 管理。
