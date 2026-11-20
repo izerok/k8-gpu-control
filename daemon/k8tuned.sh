@@ -95,9 +95,14 @@ while true; do
         target=$base
     fi
 
+    # Write every tick, not only on change: at boot this daemon starts before
+    # PhxBringup has registered the debug.phx_pm_* OIDs (PM starts 15 s in), so
+    # a single early write would be lost and the previous tier would silently
+    # never apply. Log only when the target changes.
+    sysctl -w debug.phx_pm_mode=1 >/dev/null 2>&1
+    sysctl -w debug.phx_pm_gfx_max="$target" >/dev/null 2>&1
+
     if [ "$target" != "$last_target" ]; then
-        sysctl -w debug.phx_pm_mode=1 >/dev/null 2>&1
-        sysctl -w debug.phx_pm_gfx_max="$target" >/dev/null 2>&1
         echo "$(date '+%F %T') profile=$profile auto=$auto cap=$target ws=$ws la=$la" >> "$LOG"
         last_target=$target
     fi

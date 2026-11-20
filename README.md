@@ -108,3 +108,25 @@ sysctl -w debug.nvaccel_surface_gpu_on=0
 空闲时 GFXCLK 会自然回落到 800 MHz，本工具的档位上限只限制**峰值**，不再需要用它来压空闲功耗。
 
 验证：`sysctl debug.phx_pm_gfxclk` 在空闲时应读 800，而不是 2600。
+
+## 驱动要求（务必检查）
+
+`debug.phx_pm_*` 不是所有 nullarc 构建都暴露：
+
+- **upstream main `3497d87` 的 PhxBringup 没有 PM 代码**，`debug.phx_pm_mode` 会报 `unknown oid`，
+  此时 K8 Tune 的档位写入会静默失败；
+- 本机（K8）2026-11-20 起使用 **fork `hdmi-fb2` build 37 的 PhxBringup + main `3497d87` 的 PhxAccel**
+  （两者的 `phx-fb-*` 属性 ABI 兼容），`debug.phx_pm_*` 才存在。
+
+开机自检：
+
+```sh
+sysctl debug.phx_pm_mode debug.phx_pm_gfx_max || echo "PhxBringup 缺少 PM，K8 Tune 不会生效"
+```
+
+## 开机竞态
+
+守护进程可能在 PhxBringup 注册 `debug.phx_pm_*` 之前启动（PM 在 kext 启动 15 秒后初始化）。
+因此 `k8tuned.sh` **每 2 秒都重写** `debug.phx_pm_mode=1` 和 `debug.phx_pm_gfx_max`，而不是只在档位变化时写；
+否则开机后的第一次写入会丢失，之后一直停留在 PMFW 默认策略。
+
